@@ -49,16 +49,17 @@ class MainWin(QtWidgets.QMainWindow):
         '''
         CCD Connection.
         '''
-        try:
-            self.ser = serial.Serial(str(self.lstports.currentText())[0:4], 9600, timeout=0.5)
-            MsgBox('Success', '仪器连接成功')
-            self.pushButton.setText('断开连接')
-        except Exception as e:
-            MsgBox('ERROR', '仪器连接出现错误：\n'+ str(e))
-        if self.ser.is_open()==False:
+        if self.ser.is_open ==False:
+            try:
+                self.ser = serial.Serial(str(self.lstports.currentText())[0:4], 9600, timeout=0.5)
+                MsgBox('Success', '仪器连接成功！')
+                self.pushButton.setText('断开连接')
+            except Exception as e:
+                MsgBox('ERROR', '仪器连接出现错误：\n'+ str(e))
             self.seri = Datacollect(self.ser, self.plotting.canvas)
         else:
             self.ser.close()
+            MsgBox('Success', '仪器已经关闭！')
             self.pushButton.setText('连接仪器')
 
     def StartCollection(self, checked):
@@ -86,6 +87,8 @@ class MainWin(QtWidgets.QMainWindow):
         uic.loadUi('MyUI.ui', self)
         self.setWindowTitle("拉曼光谱测定实验小助手")
         self.ports = list(list_ports.comports())
+        self.ser = serial.Serial(None)
+        self.ser.close()
         self.lstports.addItems(map(str, self.ports))
         self.pushButton.clicked.connect(self.CCDConnect)
         self.pushButton_2.setCheckable(True)
